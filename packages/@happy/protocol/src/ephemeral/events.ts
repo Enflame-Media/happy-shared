@@ -26,24 +26,25 @@ export type ApiEphemeralActivityUpdate = z.infer<typeof ApiEphemeralActivityUpda
  * Token/cost usage update
  *
  * Real-time cost and token tracking for a session.
+ * Uses flexible Record types to accommodate varying token breakdown keys
+ * from different AI providers (Claude, Codex, etc.)
+ *
+ * Required: `total` key must be present
+ * Optional: Additional breakdown keys (input, output, cache_creation, cache_read, etc.)
  */
 export const ApiEphemeralUsageUpdateSchema = z.object({
     type: z.literal('usage'),
     id: z.string(), // Session ID
     key: z.string(), // Usage key/identifier
     timestamp: z.number(),
-    tokens: z.object({
-        total: z.number(),
-        input: z.number(),
-        output: z.number(),
-        cache_creation: z.number(),
-        cache_read: z.number(),
-    }),
-    cost: z.object({
-        total: z.number(),
-        input: z.number(),
-        output: z.number(),
-    }),
+    tokens: z.record(z.string(), z.number()).refine(
+        (obj) => typeof obj.total === 'number',
+        { message: 'tokens.total is required' }
+    ),
+    cost: z.record(z.string(), z.number()).refine(
+        (obj) => typeof obj.total === 'number',
+        { message: 'cost.total is required' }
+    ),
 });
 
 export type ApiEphemeralUsageUpdate = z.infer<typeof ApiEphemeralUsageUpdateSchema>;
