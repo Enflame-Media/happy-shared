@@ -1,0 +1,57 @@
+# Root monorepo gitignore
+# This repo tracks shared packages and root config only.
+# Each project (happy-app, happy-cli, etc.) has its own git repo.
+
+# Project directories (have their own git repos)
+/happy-app/
+/happy-cli/
+/happy-server/
+/happy-server-workers/
+
+# Dependencies (yarn workspaces hoisted dependencies)
+node_modules/
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files (each project has its own)
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Temp directories (used for Prisma on NAS with noexec /tmp)
+.tmp/
+
+# AI/Tool config directories (local to developer machine)
+.serena/
+.zencoder/
+.zenflow/
+.mcp.json
+
+# Claude Code config (local overrides)
+.claude/
+
+# Build artifacts for shared packages
+packages/**/dist/

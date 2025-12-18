@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "happy-monorepo",
+  "description": "Happy monorepo - Mobile and web client for Claude Code and Codex",
+  "packageManager": "yarn@4.12.0",
+  "workspaces": [
+    "packages/@happy/*",
+    "happy-cli",
+    "happy-server",
+    "happy-server-workers",
+    "happy-app"
+  ],
+  "scripts": {
+    "build:protocol": "yarn workspace @happy/protocol build",
+    "typecheck:protocol": "yarn workspace @happy/protocol typecheck"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
