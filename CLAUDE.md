@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Happy** is a mobile and web client for Claude Code and Codex, enabling remote control and session sharing across devices with end-to-end encryption. This is a TypeScript monorepo containing three independent projects:
+**Happy** is a mobile and web client for Claude Code and Codex, enabling remote control and session sharing across devices with end-to-end encryption. This is a TypeScript monorepo containing four projects and shared packages:
 
 1. **happy-cli** (`/happy-cli/`) - Command-line wrapper for Claude Code and Codex
 2. **happy-server** (`/happy-server/`) - Backend API server for encrypted sync
 3. **happy-app** (`/happy-app/`) - React Native mobile/web client
+4. **happy-server-workers** (`/happy-server-workers/`) - Cloudflare Workers edge functions
 
 Each project has its own `CLAUDE.md` with detailed guidelines. **Always consult the project-specific CLAUDE.md when working within that project's directory.**
 
@@ -16,6 +17,9 @@ Each project has its own `CLAUDE.md` with detailed guidelines. **Always consult 
 
 ```
 /happy/
+├── packages/           # Shared packages (tracked in happy-shared repo)
+│   └── @happy/
+│       └── protocol/  # Shared Zod schemas for API updates/events
 ├── happy-cli/          # Node.js CLI (ESM)
 │   ├── src/           # TypeScript sources
 │   ├── bin/           # Executable scripts
@@ -26,16 +30,69 @@ Each project has its own `CLAUDE.md` with detailed guidelines. **Always consult 
 │   ├── prisma/        # Database schema
 │   ├── package.json   # Uses yarn
 │   └── CLAUDE.md      # Server-specific guidelines
-└── happy-app/          # Expo React Native (ESM)
-    ├── sources/       # TypeScript sources (note: not 'src')
-    ├── app/           # Expo Router screens
-    ├── package.json   # Uses yarn
-    └── CLAUDE.md      # App-specific guidelines
+├── happy-server-workers/ # Cloudflare Workers (ESM)
+│   ├── src/           # TypeScript sources
+│   ├── wrangler.toml  # Cloudflare config
+│   └── package.json   # Uses yarn
+├── happy-app/          # Expo React Native (ESM)
+│   ├── sources/       # TypeScript sources (note: not 'src')
+│   ├── app/           # Expo Router screens
+│   ├── package.json   # Uses yarn
+│   └── CLAUDE.md      # App-specific guidelines
+├── package.json        # Root workspaces config
+└── yarn.lock           # Shared lockfile
 ```
 
 ## Package Management
 
-All three projects use **yarn** (not npm). Each project manages its own dependencies independently. There is no root `package.json` or workspaces configuration.
+All projects use **yarn** (not npm). The monorepo uses **yarn workspaces** configured in the root `package.json` to:
+- Share dependencies across projects (hoisted to root `node_modules/`)
+- Link shared packages like `@happy/protocol` via `workspace:*`
+- Maintain a single `yarn.lock` for consistent dependency versions
+
+## Shared Packages
+
+Shared packages live in `packages/@happy/` and are tracked in the `happy-shared` GitHub repository (separate from individual project repos).
+
+### @happy/protocol
+
+The `@happy/protocol` package provides shared Zod schemas for:
+- **API Updates**: Session, machine, message, artifact, account schemas
+- **Ephemeral Events**: Real-time events like typing indicators, cost updates
+
+**Usage:**
+```typescript
+import { SessionUpdateSchema, MachineUpdateSchema } from '@happy/protocol';
+```
+
+**Building:**
+```bash
+yarn workspace @happy/protocol build
+yarn workspace @happy/protocol typecheck
+```
+
+Projects consume it via workspace linking:
+```json
+{
+  "dependencies": {
+    "@happy/protocol": "workspace:*"
+  }
+}
+```
+
+## Git Repository Structure
+
+The monorepo uses **multiple git repositories**:
+
+| Repository | Tracks | GitHub |
+|------------|--------|--------|
+| `happy-shared` | Root configs, `packages/`, docs | [Enflame-Media/happy-shared](https://github.com/Enflame-Media/happy-shared) |
+| `happy-app` | Mobile/web app code | [Enflame-Media/happy](https://github.com/Enflame-Media/happy) |
+| `happy-cli` | CLI wrapper code | Individual repo |
+| `happy-server` | Backend server code | Individual repo |
+| `happy-server-workers` | Cloudflare Workers | Individual repo |
+
+Each project directory has its own `.git/` - they are independent repositories.
 
 ## Development Workflow
 
@@ -66,7 +123,8 @@ When changes span multiple projects:
    - `happy-cli` - Update API client to match
    - `happy-app` - Update sync logic to match
 
-2. **Type definitions**: Each project maintains its own types. Shared protocol definitions exist in:
+2. **Type definitions**: Use `@happy/protocol` for shared types. Project-specific types remain in:
+   - Shared: `packages/@happy/protocol/` (Zod schemas for API updates/events)
    - Server: `sources/app/api/types.ts`
    - CLI: `src/api/types.ts`
    - App: `sources/sync/types.ts`
@@ -263,4 +321,5 @@ All three communicate via the HTTP/WebSocket API defined by happy-server.
 2. **Respect different conventions** (ESM vs CommonJS, src vs sources, 2-space vs 4-space indentation)
 3. **Test independently** - each project has its own test suite
 4. **Consider backward compatibility** - mobile apps may be on older versions
-5. **Update all three** when changing shared protocols or types
+5. **Update @happy/protocol first** when changing shared types, then update consuming projects
+6. **Commit to correct repo** - shared packages go to `happy-shared`, project code to individual repos
