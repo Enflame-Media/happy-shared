@@ -1,6 +1,7 @@
 # happy-shared
 
 [![CI](https://github.com/Enflame-Media/happy-shared/actions/workflows/ci.yml/badge.svg)](https://github.com/Enflame-Media/happy-shared/actions/workflows/ci.yml)
+[![Shared Types Validation](https://github.com/Enflame-Media/happy-shared/actions/workflows/shared-types-validation.yml/badge.svg)](https://github.com/Enflame-Media/happy-shared/actions/workflows/shared-types-validation.yml)
 
 Shared packages and root configurations for the Happy monorepo.
 
@@ -63,6 +64,28 @@ yarn workspace @happy/protocol typecheck
 |--------|-------------|
 | `yarn build:protocol` | Build @happy/protocol |
 | `yarn typecheck:protocol` | Type check @happy/protocol |
+
+## CI/CD Pipeline
+
+The repository uses GitHub Actions for continuous integration. Every PR triggers:
+
+| Check | Projects | Description |
+|-------|----------|-------------|
+| **Type Check** | happy-cli, happy-app, happy-server-workers | TypeScript compilation |
+| **Lint** | happy-cli, happy-app, happy-server-workers | ESLint/OxLint validation |
+| **Tests** | happy-server-workers | Vitest test suite |
+| **Build** | happy-cli, happy-server-workers | Production build verification |
+
+### Branch Protection
+
+PRs require all CI checks to pass before merge. The `ci-summary` job acts as a single status check that blocks merge if any quality gate fails.
+
+### Dependabot
+
+Security updates are automated via Dependabot:
+- Weekly scans for npm vulnerabilities
+- GitHub Actions dependency updates
+- Grouped minor/patch updates to reduce PR noise
 
 ## Related Repositories
 
