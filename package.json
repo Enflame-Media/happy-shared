@@ -11,6 +11,7 @@
     "happy-app"
   ],
   "scripts": {
+    "postinstall": "yarn workspace @happy/protocol build",
     "build:protocol": "yarn workspace @happy/protocol build",
     "typecheck:protocol": "yarn workspace @happy/protocol typecheck"
   },
