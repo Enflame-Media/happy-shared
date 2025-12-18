@@ -1,0 +1,85 @@
+# Shared Types Validation
+# Validates that @happy/protocol changes don't break any consumer project
+# Part of HAP-383 implementation (Phase 6 - HAP-389)
+
+name: Shared Types Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/@happy/protocol/**'
+  pull_request:
+    paths:
+      - 'packages/@happy/protocol/**'
+
+jobs:
+  validate-shared-types:
+    name: Validate Cross-Project Types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack (for Yarn 4)
+        run: corepack enable
+
+      - name: Get yarn cache directory
+        id: yarn-cache-dir
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir.outputs.dir }}
+            **/node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build @happy/protocol
+        run: yarn build:protocol
+
+      - name: Type check @happy/protocol
+        run: yarn typecheck:protocol
+
+      - name: Type check happy-cli
+        working-directory: happy-cli
+        run: yarn typecheck
+
+      - name: Type check happy-app
+        working-directory: happy-app
+        run: yarn typecheck
+
+      - name: Type check happy-server
+        working-directory: happy-server
+        run: yarn build
+
+      - name: Type check happy-server-workers
+        working-directory: happy-server-workers
+        run: yarn typecheck
+
+      - name: Summary
+        run: |
+          echo "## Shared Types Validation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All 4 consumer projects type-check successfully against @happy/protocol." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Projects Validated" >> $GITHUB_STEP_SUMMARY
+          echo "- happy-cli" >> $GITHUB_STEP_SUMMARY
+          echo "- happy-app" >> $GITHUB_STEP_SUMMARY
+          echo "- happy-server" >> $GITHUB_STEP_SUMMARY
+          echo "- happy-server-workers" >> $GITHUB_STEP_SUMMARY
