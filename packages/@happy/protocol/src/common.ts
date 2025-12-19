@@ -26,14 +26,16 @@ export type GitHubProfile = z.infer<typeof GitHubProfileSchema>;
 /**
  * Image reference for avatars and other media
  *
- * Note: All fields required to match happy-app's profile.ts requirements
+ * Note: width, height, and thumbhash are optional because:
+ * - Image dimensions may not be available at upload time
+ * - Thumbhash is generated asynchronously and may not exist yet
  */
 export const ImageRefSchema = z.object({
-    width: z.number(),
-    height: z.number(),
-    thumbhash: z.string(),
     path: z.string(),
     url: z.string(),
+    width: z.number().optional(),
+    height: z.number().optional(),
+    thumbhash: z.string().optional(),
 });
 
 export type ImageRef = z.infer<typeof ImageRefSchema>;
