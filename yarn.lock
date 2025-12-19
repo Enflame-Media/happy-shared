@@ -14425,7 +14425,6 @@ __metadata:
     "@happy/protocol": "workspace:*"
     "@modelcontextprotocol/sdk": "npm:^1.25.1"
     "@sentry/node": "npm:^10.32.0"
-    "@stablelib/base64": "npm:^2.0.1"
     "@stablelib/hex": "npm:^2.0.1"
     "@types/cross-spawn": "npm:^6.0.6"
     "@types/http-proxy": "npm:^1.17.17"
