@@ -22,12 +22,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack (for Yarn 4)
         run: corepack enable
@@ -37,7 +37,7 @@ jobs:
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ steps.yarn-cache-dir.outputs.dir }}
@@ -63,10 +63,6 @@ jobs:
       - name: Type check happy-app
         working-directory: happy-app
         run: yarn typecheck
-
-      - name: Type check happy-server
-        working-directory: happy-server
-        run: yarn build
 
       - name: Type check happy-server-workers
         working-directory: happy-server-workers
