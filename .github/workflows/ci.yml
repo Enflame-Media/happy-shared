@@ -25,12 +25,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack (for Yarn 4)
         run: corepack enable
@@ -40,7 +40,7 @@ jobs:
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ steps.yarn-cache-dir.outputs.dir }}
@@ -60,7 +60,7 @@ jobs:
 
       # Upload built protocol for dependent jobs
       - name: Upload protocol dist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -77,18 +77,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -98,7 +98,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -118,18 +118,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -139,7 +139,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -159,18 +159,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -180,7 +180,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -203,18 +203,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -224,7 +224,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -244,18 +244,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -265,7 +265,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -285,18 +285,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -306,7 +306,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -329,18 +329,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -350,7 +350,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -373,18 +373,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -394,7 +394,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
@@ -419,18 +419,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Cache yarn dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .yarn/cache
@@ -440,7 +440,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Download protocol dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: protocol-dist
           path: packages/@happy/protocol/dist
