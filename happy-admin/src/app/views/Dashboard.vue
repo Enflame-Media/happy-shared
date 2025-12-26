@@ -3,74 +3,58 @@
  * Dashboard View
  *
  * Main dashboard displaying sync metrics from Analytics Engine.
- * Shows summary stats, charts, and distribution data.
+ * Uses composables for data fetching and chart transformations.
+ * Features responsive design for desktop, tablet, and mobile.
  */
-import { ref, onMounted } from 'vue';
+import { onMounted, computed, toRef } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAnalytics } from '../composables/useAnalytics';
+import { useMetrics } from '../composables/useMetrics';
+import DateRangeSelector from '../components/DateRangeSelector.vue';
+import MetricsSummary from '../components/MetricsSummary.vue';
+import SyncMetricsChart from '../components/SyncMetricsChart.vue';
+import ModeDistribution from '../components/ModeDistribution.vue';
+import PerformanceTrends from '../components/PerformanceTrends.vue';
+import { formatDuration, formatPercent } from '../lib/api';
 
 const router = useRouter();
 
-interface MetricsSummary {
-    syncType: string;
-    syncMode: string;
-    count: number;
-    avgDurationMs: number;
-    p95DurationMs: number;
-    successRate: number;
-}
+// Initialize analytics composable
+const {
+    loading,
+    error,
+    timeRange,
+    autoRefreshEnabled,
+    state,
+    avgSuccessRate,
+    avgDuration,
+    fetchAll,
+    setTimeRange,
+    toggleAutoRefresh,
+    startAutoRefresh,
+} = useAnalytics();
 
-interface ModeDistribution {
-    full: number;
-    incremental: number;
-    cached: number;
-    total: number;
-}
+// Initialize metrics composable with reactive state refs
+const {
+    timeseriesChartData,
+    durationChartData,
+    modeDistributionChartData,
+    performanceByTypeChartData,
+} = useMetrics(
+    toRef(() => state.value.timeseries),
+    toRef(() => state.value.summary),
+    toRef(() => state.value.modeDistribution)
+);
 
-interface CacheHitRate {
-    hits: number;
-    misses: number;
-    hitRate: number;
-}
-
-const loading = ref(true);
-const error = ref('');
-const summary = ref<MetricsSummary[]>([]);
-const distribution = ref<ModeDistribution | null>(null);
-const cacheStats = ref<CacheHitRate | null>(null);
-const lastUpdated = ref('');
+// Computed values for MetricsSummary
+const totalSyncs = computed(() => state.value.modeDistribution?.total ?? 0);
+const cacheHitRate = computed(() => state.value.cacheHits?.hitRate ?? null);
 
 /**
- * Fetch all metrics data from API
+ * Handle time range change
  */
-async function fetchMetrics() {
-    loading.value = true;
-    error.value = '';
-
-    try {
-        const [summaryRes, distributionRes, cacheRes] = await Promise.all([
-            fetch('/api/metrics/summary', { credentials: 'include' }),
-            fetch('/api/metrics/mode-distribution', { credentials: 'include' }),
-            fetch('/api/metrics/cache-hits', { credentials: 'include' }),
-        ]);
-
-        if (!summaryRes.ok || !distributionRes.ok || !cacheRes.ok) {
-            throw new Error('Failed to fetch metrics');
-        }
-
-        const summaryData = await summaryRes.json();
-        const distributionData = await distributionRes.json();
-        const cacheData = await cacheRes.json();
-
-        summary.value = summaryData.data;
-        distribution.value = distributionData.data;
-        cacheStats.value = cacheData.data;
-        lastUpdated.value = new Date().toLocaleTimeString();
-    } catch (err) {
-        error.value = 'Failed to load metrics. Please try again.';
-        console.error('Metrics fetch error:', err);
-    } finally {
-        loading.value = false;
-    }
+async function handleTimeRangeChange(range: typeof timeRange.value) {
+    await setTimeRange(range);
 }
 
 /**
@@ -88,51 +72,66 @@ async function handleLogout() {
     }
 }
 
-/**
- * Format percentage for display
- */
-function formatPercent(value: number): string {
-    return `${(value * 100).toFixed(1)}%`;
-}
-
-/**
- * Format duration for display
- */
-function formatDuration(ms: number): string {
-    if (ms < 1000) {
-        return `${ms.toFixed(0)}ms`;
-    }
-    return `${(ms / 1000).toFixed(2)}s`;
-}
-
+// Fetch data on mount and start auto-refresh
 onMounted(() => {
-    fetchMetrics();
-    // Auto-refresh every 5 minutes
-    setInterval(fetchMetrics, 5 * 60 * 1000);
+    fetchAll();
+    startAutoRefresh();
 });
 </script>
 
 <template>
     <div class="min-h-screen">
         <!-- Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-sm">
+        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <h1 class="text-xl font-bold text-gray-900 dark:text-white">
                         Happy Admin Dashboard
                     </h1>
-                    <div class="flex items-center gap-4">
-                        <span v-if="lastUpdated" class="text-sm text-gray-500">
-                            Last updated: {{ lastUpdated }}
-                        </span>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Time Range Selector -->
+                        <DateRangeSelector
+                            v-model="timeRange"
+                            :disabled="loading"
+                            @update:model-value="handleTimeRangeChange"
+                        />
+
+                        <!-- Auto-refresh toggle -->
                         <button
-                            @click="fetchMetrics"
+                            class="text-sm px-3 py-1.5 rounded-lg transition-colors"
+                            :class="
+                                autoRefreshEnabled
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                            "
+                            @click="toggleAutoRefresh()"
+                        >
+                            {{ autoRefreshEnabled ? 'Auto ✓' : 'Auto ✗' }}
+                        </button>
+
+                        <!-- Last updated -->
+                        <span
+                            v-if="state.lastUpdated"
+                            class="hidden sm:inline text-sm text-gray-500 dark:text-gray-400"
+                        >
+                            Updated: {{ state.lastUpdated }}
+                        </span>
+
+                        <!-- Refresh button -->
+                        <button
                             class="btn-secondary text-sm"
                             :disabled="loading"
+                            @click="fetchAll"
                         >
-                            Refresh
+                            <span v-if="loading" class="inline-flex items-center gap-1">
+                                <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                                Loading...
+                            </span>
+                            <span v-else>Refresh</span>
                         </button>
-                        <button @click="handleLogout" class="btn-secondary text-sm">
+
+                        <!-- Sign Out -->
+                        <button class="btn-secondary text-sm" @click="handleLogout">
                             Sign Out
                         </button>
                     </div>
@@ -141,144 +140,169 @@ onMounted(() => {
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Loading State -->
-            <div v-if="loading && !summary.length" class="text-center py-12">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-happy-600 mx-auto"></div>
-                <p class="mt-4 text-gray-600 dark:text-gray-400">Loading metrics...</p>
-            </div>
-
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
             <!-- Error State -->
-            <div v-else-if="error" class="card text-center py-12">
-                <p class="text-red-600">{{ error }}</p>
-                <button @click="fetchMetrics" class="btn-primary mt-4">
+            <div v-if="error" class="card text-center py-12 mb-6">
+                <svg
+                    class="w-12 h-12 text-red-400 mx-auto mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                </svg>
+                <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
+                <button class="btn-primary" @click="fetchAll">
                     Try Again
                 </button>
             </div>
 
             <!-- Dashboard Content -->
-            <div v-else class="space-y-8">
-                <!-- Stats Overview -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Total Syncs -->
-                    <div class="card">
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            Total Syncs (24h)
-                        </h3>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ distribution?.total.toLocaleString() ?? '—' }}
-                        </p>
-                    </div>
+            <div v-else class="space-y-6 md:space-y-8">
+                <!-- Summary Cards -->
+                <MetricsSummary
+                    :total-syncs="totalSyncs"
+                    :avg-duration="avgDuration"
+                    :cache-hit-rate="cacheHitRate"
+                    :success-rate="avgSuccessRate"
+                    :loading="loading && !state.summary.length"
+                />
 
-                    <!-- Cache Hit Rate -->
-                    <div class="card">
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            Cache Hit Rate
-                        </h3>
-                        <p class="mt-2 text-3xl font-bold text-happy-600">
-                            {{ cacheStats ? formatPercent(cacheStats.hitRate) : '—' }}
-                        </p>
-                    </div>
-
-                    <!-- Success Rate -->
-                    <div class="card">
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            Avg Success Rate
-                        </h3>
-                        <p class="mt-2 text-3xl font-bold text-green-600">
-                            {{
-                                summary.length
-                                    ? formatPercent(
-                                          summary.reduce((acc, s) => acc + s.successRate, 0) /
-                                              summary.length
-                                      )
-                                    : '—'
-                            }}
-                        </p>
-                    </div>
+                <!-- Charts Row 1: Line Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <SyncMetricsChart
+                        :data="timeseriesChartData"
+                        title="Sync Activity Over Time"
+                        y-axis-label="Sync Count"
+                        :loading="loading && !state.timeseries.length"
+                    />
+                    <SyncMetricsChart
+                        :data="durationChartData"
+                        title="Average Duration Over Time"
+                        y-axis-label="Duration (ms)"
+                        :loading="loading && !state.timeseries.length"
+                    />
                 </div>
 
-                <!-- Mode Distribution -->
-                <div class="card">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        Sync Mode Distribution
-                    </h2>
-                    <div v-if="distribution" class="grid grid-cols-3 gap-4">
-                        <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <p class="text-2xl font-bold text-blue-600">
-                                {{ distribution.full.toLocaleString() }}
-                            </p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Full Sync</p>
-                        </div>
-                        <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                            <p class="text-2xl font-bold text-green-600">
-                                {{ distribution.incremental.toLocaleString() }}
-                            </p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Incremental</p>
-                        </div>
-                        <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                            <p class="text-2xl font-bold text-purple-600">
-                                {{ distribution.cached.toLocaleString() }}
-                            </p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Cached</p>
-                        </div>
-                    </div>
+                <!-- Charts Row 2: Doughnut and Bar -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ModeDistribution
+                        :data="modeDistributionChartData"
+                        :loading="loading && !state.modeDistribution"
+                    />
+                    <PerformanceTrends
+                        :data="performanceByTypeChartData"
+                        title="Sync Count by Type"
+                        y-axis-label="Count"
+                        :loading="loading && !state.summary.length"
+                    />
                 </div>
 
                 <!-- Detailed Metrics Table -->
-                <div class="card">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div class="card overflow-hidden">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-6 pt-6">
                         Metrics by Type &amp; Mode
                     </h2>
-                    <div class="overflow-x-auto">
+
+                    <!-- Loading State for table -->
+                    <div
+                        v-if="loading && !state.summary.length"
+                        class="flex items-center justify-center py-12"
+                    >
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-happy-600" />
+                    </div>
+
+                    <!-- Empty State -->
+                    <div
+                        v-else-if="!state.summary.length"
+                        class="flex items-center justify-center py-12"
+                    >
+                        <p class="text-gray-400 dark:text-gray-500">No metrics data available</p>
+                    </div>
+
+                    <!-- Table -->
+                    <div v-else class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead>
+                            <thead class="bg-gray-50 dark:bg-gray-800/50">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                    >
                                         Type
                                     </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                    >
                                         Mode
                                     </th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                    >
                                         Count
                                     </th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                    >
                                         Avg Duration
                                     </th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                    >
                                         P95 Duration
                                     </th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                                    >
                                         Success Rate
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr v-for="metric in summary" :key="`${metric.syncType}-${metric.syncMode}`">
-                                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr
+                                    v-for="metric in state.summary"
+                                    :key="`${metric.syncType}-${metric.syncMode}`"
+                                    class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                >
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                         {{ metric.syncType }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                        {{ metric.syncMode }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                                            :class="{
+                                                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
+                                                    metric.syncMode === 'full',
+                                                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
+                                                    metric.syncMode === 'incremental',
+                                                'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400':
+                                                    metric.syncMode === 'cached',
+                                            }"
+                                        >
+                                            {{ metric.syncMode }}
+                                        </span>
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-white">
                                         {{ metric.count.toLocaleString() }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">
                                         {{ formatDuration(metric.avgDurationMs) }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600 dark:text-gray-400">
                                         {{ formatDuration(metric.p95DurationMs) }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-right">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right">
                                         <span
                                             :class="
                                                 metric.successRate >= 0.95
-                                                    ? 'text-green-600'
+                                                    ? 'text-green-600 dark:text-green-400'
                                                     : metric.successRate >= 0.9
-                                                    ? 'text-yellow-600'
-                                                    : 'text-red-600'
+                                                      ? 'text-yellow-600 dark:text-yellow-400'
+                                                      : 'text-red-600 dark:text-red-400'
                                             "
                                         >
                                             {{ formatPercent(metric.successRate) }}
