@@ -95,10 +95,17 @@ jobs:
           NODE_ENV: production
           APP_ENV: development
 
-      # Analyze current bundle
+      # Analyze current bundle and report to Analytics Engine (HAP-564)
       - name: Analyze bundle size
         id: analyze
         working-directory: happy-app
+        env:
+          # Analytics Engine reporting (HAP-564)
+          # These are optional - if not configured, reporting is skipped gracefully
+          HAPPY_API_URL: ${{ secrets.HAPPY_API_URL }}
+          CI_METRICS_API_KEY: ${{ secrets.CI_METRICS_API_KEY }}
+          # PR number is a safe integer value, not user-controlled text
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           # Run analysis with baseline if available
           if [ -f "../.bundle-baseline.json" ]; then
@@ -222,8 +229,12 @@ jobs:
           NODE_ENV: production
           APP_ENV: development
 
-      - name: Generate baseline stats
+      - name: Generate baseline stats and report to Analytics Engine
         working-directory: happy-app
+        env:
+          # Analytics Engine reporting (HAP-564)
+          HAPPY_API_URL: ${{ secrets.HAPPY_API_URL }}
+          CI_METRICS_API_KEY: ${{ secrets.CI_METRICS_API_KEY }}
         run: yarn analyze:bundle --output ../.bundle-baseline.json
 
       # Save baseline to cache for future PR comparisons
