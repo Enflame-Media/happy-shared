@@ -2,46 +2,78 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Navigation**: This is the root documentation. Each project has its own detailed CLAUDE.md—see [Project Documentation](#project-documentation) below.
+
 ## Project Overview
 
-**Happy** is a mobile and web client for Claude Code and Codex, enabling remote control and session sharing across devices with end-to-end encryption. This is a TypeScript monorepo containing four projects and shared packages:
+**Happy** is a mobile and web client for Claude Code and Codex, enabling remote control and session sharing across devices with end-to-end encryption. This is a TypeScript monorepo containing four projects and shared packages.
 
-1. **happy-cli** (`/happy-cli/`) - Command-line wrapper for Claude Code and Codex
-2. **happy-server** (`/happy-server/`) - Backend API server for encrypted sync
-3. **happy-app** (`/happy-app/`) - React Native mobile/web client
-4. **happy-server-workers** (`/happy-server-workers/`) - Cloudflare Workers edge functions
+## Project Documentation
 
-Each project has its own `CLAUDE.md` with detailed guidelines. **Always consult the project-specific CLAUDE.md when working within that project's directory.**
+**⚠️ Always consult the project-specific CLAUDE.md when working within that project's directory.**
+
+### Applications
+
+| Project | Directory | Description | Documentation |
+|---------|-----------|-------------|---------------|
+| **happy-cli** | [`/happy-cli/`](./happy-cli/) | Node.js CLI wrapper for Claude Code | [`happy-cli/CLAUDE.md`](./happy-cli/CLAUDE.md) |
+| **happy-app** | [`/happy-app/`](./happy-app/) | React Native mobile/web client (Expo) | [`happy-app/CLAUDE.md`](./happy-app/CLAUDE.md) |
+| **happy-server** | [`/happy-server/`](./happy-server/) | Fastify backend API server | [`happy-server/CLAUDE.md`](./happy-server/CLAUDE.md) |
+| **happy-server-workers** | [`/happy-server-workers/`](./happy-server-workers/) | Cloudflare Workers edge functions | [`happy-server-workers/CLAUDE.md`](./happy-server-workers/CLAUDE.md) |
+
+### Shared Packages
+
+| Package | Directory | Description | Documentation |
+|---------|-----------|-------------|---------------|
+| **@happy/protocol** | [`packages/@happy/protocol/`](./packages/@happy/protocol/) | Shared Zod schemas for API types | [`packages/@happy/protocol/CLAUDE.md`](./packages/@happy/protocol/CLAUDE.md) |
+| **@happy/errors** | [`packages/@happy/errors/`](./packages/@happy/errors/) | Unified error handling (AppError) | [`packages/@happy/errors/CLAUDE.md`](./packages/@happy/errors/CLAUDE.md) |
+
+### Additional Documentation
+
+| Document | Location | Description |
+|----------|----------|-------------|
+| Encryption Architecture | [`docs/ENCRYPTION-ARCHITECTURE.md`](./docs/ENCRYPTION-ARCHITECTURE.md) | E2E encryption design |
+| Error Codes | [`docs/errors/`](./docs/errors/) | CLI error code documentation |
+| Shared Types RFC | [`docs/RFC-SHARED-TYPES-PACKAGE.md`](./docs/RFC-SHARED-TYPES-PACKAGE.md) | Design decision for @happy/protocol |
 
 ## Monorepo Structure
 
 ```
 /happy/
-├── packages/           # Shared packages (tracked in happy-shared repo)
+├── CLAUDE.md               # ← You are here (root documentation)
+├── packages/               # Shared packages (tracked in happy-shared repo)
 │   └── @happy/
-│       └── protocol/  # Shared Zod schemas for API updates/events
-├── happy-cli/          # Node.js CLI (ESM)
-│   ├── src/           # TypeScript sources
-│   ├── bin/           # Executable scripts
-│   ├── package.json   # Uses yarn
-│   └── CLAUDE.md      # CLI-specific guidelines
-├── happy-server/       # Fastify server (CommonJS)
-│   ├── sources/       # TypeScript sources (note: not 'src')
-│   ├── prisma/        # Database schema
-│   ├── package.json   # Uses yarn
-│   └── CLAUDE.md      # Server-specific guidelines
-├── happy-server-workers/ # Cloudflare Workers (ESM)
-│   ├── src/           # TypeScript sources
-│   ├── wrangler.toml  # Cloudflare config
-│   └── package.json   # Uses yarn
-├── happy-app/          # Expo React Native (ESM)
-│   ├── sources/       # TypeScript sources (note: not 'src')
-│   ├── app/           # Expo Router screens
-│   ├── package.json   # Uses yarn
-│   └── CLAUDE.md      # App-specific guidelines
-├── package.json        # Root workspaces config
-└── yarn.lock           # Shared lockfile
+│       ├── protocol/       # Shared Zod schemas for API updates/events
+│       │   └── CLAUDE.md   # Protocol package guidelines
+│       └── errors/         # Unified error handling
+│           └── CLAUDE.md   # Errors package guidelines
+├── happy-cli/              # Node.js CLI (ESM)
+│   ├── src/                # TypeScript sources
+│   ├── bin/                # Executable scripts
+│   ├── package.json
+│   └── CLAUDE.md           # CLI-specific guidelines ★
+├── happy-server/           # Fastify server (CommonJS)
+│   ├── sources/            # TypeScript sources (note: not 'src')
+│   ├── prisma/             # Database schema
+│   ├── package.json
+│   └── CLAUDE.md           # Server-specific guidelines ★
+├── happy-server-workers/   # Cloudflare Workers (ESM)
+│   ├── src/                # TypeScript sources
+│   ├── wrangler.toml       # Cloudflare config
+│   ├── package.json
+│   └── CLAUDE.md           # Workers-specific guidelines ★
+├── happy-app/              # Expo React Native (ESM)
+│   ├── sources/            # TypeScript sources (note: not 'src')
+│   ├── app/                # Expo Router screens
+│   ├── package.json
+│   └── CLAUDE.md           # App-specific guidelines ★
+├── docs/                   # Cross-project documentation
+│   └── ENCRYPTION-ARCHITECTURE.md
+├── package.json            # Root workspaces config
+└── yarn.lock               # Shared lockfile
 ```
+
+> ★ = Primary development guidelines for each project
 
 ## Package Management
 
@@ -52,9 +84,11 @@ All projects use **yarn** (not npm). The monorepo uses **yarn workspaces** confi
 
 ## Shared Packages
 
-Shared packages live in `packages/@happy/` and are tracked in the `happy-shared` GitHub repository (separate from individual project repos).
+Shared packages live in `packages/@happy/` and are tracked in the `happy-shared` GitHub repository (separate from individual project repos). Each package has its own [`CLAUDE.md`](#shared-packages) with detailed development guidelines.
 
 ### @happy/protocol
+
+> **Full documentation**: [`packages/@happy/protocol/CLAUDE.md`](./packages/@happy/protocol/CLAUDE.md)
 
 The `@happy/protocol` package provides shared Zod schemas for:
 - **API Updates**: Session, machine, message, artifact, account schemas
@@ -62,7 +96,7 @@ The `@happy/protocol` package provides shared Zod schemas for:
 
 **Usage:**
 ```typescript
-import { SessionUpdateSchema, MachineUpdateSchema } from '@happy/protocol';
+import { ApiUpdateSchema, type ApiUpdate } from '@happy/protocol';
 ```
 
 **Building:**
@@ -71,11 +105,33 @@ yarn workspace @happy/protocol build
 yarn workspace @happy/protocol typecheck
 ```
 
-Projects consume it via workspace linking:
+### @happy/errors
+
+> **Full documentation**: [`packages/@happy/errors/CLAUDE.md`](./packages/@happy/errors/CLAUDE.md)
+
+The `@happy/errors` package provides unified error handling:
+- **AppError class**: Standardized error structure with error codes
+- **Error codes**: Centralized error code constants
+
+**Usage:**
+```typescript
+import { AppError, ErrorCodes } from '@happy/errors';
+```
+
+**Building:**
+```bash
+yarn workspace @happy/errors build
+yarn workspace @happy/errors typecheck
+```
+
+### Consuming Shared Packages
+
+Projects consume packages via workspace linking:
 ```json
 {
   "dependencies": {
-    "@happy/protocol": "workspace:*"
+    "@happy/protocol": "workspace:*",
+    "@happy/errors": "workspace:*"
   }
 }
 ```
