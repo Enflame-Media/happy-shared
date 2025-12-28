@@ -39,3 +39,6 @@ export * from './ephemeral';
 
 // Payload wrapper schemas
 export * from './payloads';
+
+// MCP state schemas for CLI-to-App sync
+export * from './mcp';
