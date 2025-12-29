@@ -37,10 +37,11 @@ import { ApiRelationshipUpdatedSchema, ApiNewFeedPostSchema, ApiKvBatchUpdateSch
  * // Type-safe handling based on discriminator
  * switch (update.t) {
  *     case 'new-session':
- *         console.log('New session:', update.id);
- *         break;
  *     case 'new-message':
- *         console.log('Message in session:', update.sid);
+ *     case 'update-session':
+ *     case 'delete-session':
+ *         // All session updates use 'sid' (HAP-654)
+ *         console.log('Session:', update.sid);
  *         break;
  *     // ... handle other update types
  * }
