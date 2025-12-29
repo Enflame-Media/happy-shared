@@ -224,6 +224,10 @@ export interface AppErrorOptions {
 /**
  * Structured JSON representation of an AppError.
  * Used for serialization, logging, and API responses.
+ *
+ * @remarks
+ * WARNING: This includes stack traces. Use SafeAppErrorJSON for client responses
+ * to avoid leaking internal implementation details (HAP-630).
  */
 export interface AppErrorJSON {
     code: ErrorCode;
@@ -232,7 +236,21 @@ export interface AppErrorJSON {
     canTryAgain: boolean;
     cause?: string;
     context?: Record<string, unknown>;
+    /** Stack trace - INTERNAL USE ONLY, never expose to clients */
     stack?: string;
+}
+
+/**
+ * Safe JSON representation of an AppError for API responses.
+ * Omits stack traces and internal context to prevent information leakage.
+ *
+ * @remarks
+ * HAP-630: Use this for all client-facing error responses in production.
+ */
+export interface SafeAppErrorJSON {
+    code: ErrorCode;
+    message: string;
+    canTryAgain: boolean;
 }
 
 /**
@@ -343,6 +361,25 @@ export class AppError extends Error {
         return json;
     }
 
+
+    /**
+     * Converts the error to a safe JSON object for API responses.
+     * Omits stack traces and internal context to prevent information leakage.
+     *
+     * @remarks
+     * HAP-630: Always use this method for client-facing error responses.
+     * Use toJSON() only for internal logging where stack traces are needed.
+     *
+     * @returns Safe error object without sensitive details
+     */
+    toSafeJSON(): SafeAppErrorJSON {
+        return {
+            code: this.code,
+            message: this.message,
+            canTryAgain: this.canTryAgain,
+        };
+    }
+
     /**
      * Creates an AppError from an unknown error value.
      *
@@ -385,3 +422,7 @@ export class AppError extends Error {
         return error instanceof AppError;
     }
 }
+
+// Re-export safe error utilities (HAP-630)
+export { createSafeError, getErrorStatusCode } from './safeError';
+export type { SafeErrorResponse, SafeErrorOptions, ErrorStatusCode } from './safeError';
