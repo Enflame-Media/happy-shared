@@ -226,7 +226,7 @@ export interface AppErrorOptions {
  * Used for serialization, logging, and API responses.
  */
 export interface AppErrorJSON {
-    code: string;
+    code: ErrorCode;
     message: string;
     name: string;
     canTryAgain: boolean;
@@ -248,12 +248,12 @@ export interface AppErrorJSON {
  *
  * @example Basic usage
  * ```typescript
- * throw new AppError('AUTH_FAILED', 'Session expired');
+ * throw new AppError(ErrorCodes.AUTH_FAILED, 'Session expired');
  * ```
  *
  * @example With retry capability
  * ```typescript
- * throw new AppError('FETCH_FAILED', 'Network error', { canTryAgain: true });
+ * throw new AppError(ErrorCodes.FETCH_FAILED, 'Network error', { canTryAgain: true });
  * ```
  *
  * @example With cause chain and context
@@ -261,7 +261,7 @@ export interface AppErrorJSON {
  * try {
  *   await fetch(url);
  * } catch (error) {
- *   throw new AppError('API_ERROR', 'Failed to fetch data', {
+ *   throw new AppError(ErrorCodes.API_ERROR, 'Failed to fetch data', {
  *     canTryAgain: true,
  *     cause: error instanceof Error ? error : undefined,
  *     context: { url, attemptNumber: 3 }
@@ -272,13 +272,13 @@ export interface AppErrorJSON {
  * @example Static factory for wrapping unknown errors
  * ```typescript
  * catch (error) {
- *   throw AppError.fromUnknown('OPERATION_FAILED', 'Failed', error, true);
+ *   throw AppError.fromUnknown(ErrorCodes.OPERATION_FAILED, 'Failed', error, true);
  * }
  * ```
  */
 export class AppError extends Error {
     /** Error code for programmatic identification */
-    public readonly code: string;
+    public readonly code: ErrorCode;
 
     /** Whether the user can retry the operation */
     public readonly canTryAgain: boolean;
@@ -295,7 +295,7 @@ export class AppError extends Error {
     /**
      * Creates a new AppError instance.
      *
-     * @param code - Error code string for programmatic identification
+     * @param code - Error code from ErrorCodes for type-safe programmatic identification
      * @param message - Human-readable error message
      * @param options - Optional configuration
      * @param options.canTryAgain - Whether the operation can be retried (default: false)
@@ -303,7 +303,7 @@ export class AppError extends Error {
      * @param options.context - Optional additional metadata for logging
      */
     constructor(
-        code: string,
+        code: ErrorCode,
         message: string,
         options?: AppErrorOptions
     ) {
@@ -346,14 +346,14 @@ export class AppError extends Error {
     /**
      * Creates an AppError from an unknown error value.
      *
-     * @param code - Error code to assign
+     * @param code - Error code from ErrorCodes to assign
      * @param message - Error message
      * @param error - Unknown error value to wrap
      * @param canTryAgain - Whether the operation can be retried (default: false)
      * @returns AppError instance with cause chain if error was an Error
      */
     static fromUnknown(
-        code: string,
+        code: ErrorCode,
         message: string,
         error: unknown,
         canTryAgain: boolean = false
@@ -366,12 +366,12 @@ export class AppError extends Error {
      * Creates an AppError with just a cause (backward-compatible helper).
      * Useful for CLI where canTryAgain is not typically needed.
      *
-     * @param code - Error code to assign
+     * @param code - Error code from ErrorCodes to assign
      * @param message - Error message
      * @param cause - Optional error that caused this error
      * @returns AppError instance with cause
      */
-    static withCause(code: string, message: string, cause?: Error): AppError {
+    static withCause(code: ErrorCode, message: string, cause?: Error): AppError {
         return new AppError(code, message, { cause });
     }
 
