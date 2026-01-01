@@ -27,6 +27,8 @@
         "zod": "^3.0.0 || ^4.0.0"
     },
     "devDependencies": {
+        "quicktype": "^23.2.6",
+        "quicktype-core": "^23.2.6",
         "tsup": "^8.5.1",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3",
@@ -40,7 +42,9 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "clean": "rm -rf dist",
-        "schema:extract": "tsx scripts/extract-schemas.ts"
+        "schema:extract": "tsx scripts/extract-schemas.ts",
+        "generate:swift": "tsx scripts/generate-swift.ts",
+        "generate:swift:dry-run": "tsx scripts/generate-swift.ts --dry-run --verbose"
     },
     "keywords": [
         "happy",
