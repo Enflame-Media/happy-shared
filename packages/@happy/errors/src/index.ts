@@ -128,6 +128,10 @@ export const ErrorCodes = {
     /** Operation is not supported */
     UNSUPPORTED_OPERATION: 'UNSUPPORTED_OPERATION',
 
+    // Session revival errors (CLI)
+    /** Session revival failed after automatic retry */
+    SESSION_REVIVAL_FAILED: 'SESSION_REVIVAL_FAILED',
+
     // Queue/Stream errors (CLI)
     /** Queue was closed */
     QUEUE_CLOSED: 'QUEUE_CLOSED',
