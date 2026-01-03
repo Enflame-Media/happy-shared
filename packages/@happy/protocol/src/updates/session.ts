@@ -99,3 +99,62 @@ export const ApiUpdateSessionStateSchema = z.object({
 });
 
 export type ApiUpdateSessionState = z.infer<typeof ApiUpdateSessionStateSchema>;
+
+/**
+ * Archive reason for sessions
+ *
+ * @remarks
+ * - `revival_failed`: Session could not be revived after CLI reconnection
+ * - `user_requested`: User explicitly requested archival
+ * - `timeout`: Session timed out due to inactivity
+ */
+export const ArchiveReasonSchema = z.enum([
+    'revival_failed',
+    'user_requested',
+    'timeout',
+]);
+
+export type ArchiveReason = z.infer<typeof ArchiveReasonSchema>;
+
+/**
+ * Archive session update
+ *
+ * Sent when a session is archived (soft-deleted).
+ * Archived sessions are excluded from active session lists but not permanently deleted.
+ *
+ * @example
+ * ```typescript
+ * const archiveSession = ApiArchiveSessionSchema.parse({
+ *     t: 'archive-session',
+ *     sid: 'session_abc123',
+ *     archivedAt: Date.now(),
+ *     archiveReason: 'revival_failed'
+ * });
+ * ```
+ */
+export const ApiArchiveSessionSchema = z.object({
+    t: z.literal('archive-session'),
+    /**
+     * Session ID
+     *
+     * @remarks
+     * Field name: `sid` (short for session ID)
+     *
+     * All session-related schemas now use `sid` for consistency:
+     * - `new-session`, `update-session`, `new-message`, `delete-session`, `archive-session`: use `sid`
+     * - Ephemeral events (`activity`, `usage`): use `sid`
+     *
+     * @see HAP-654 - Standardization of session ID field names
+     */
+    sid: z.string().min(1).max(STRING_LIMITS.ID_MAX),
+    /**
+     * Timestamp when the session was archived (Unix milliseconds)
+     */
+    archivedAt: z.number(),
+    /**
+     * Reason for archiving the session
+     */
+    archiveReason: ArchiveReasonSchema,
+});
+
+export type ApiArchiveSession = z.infer<typeof ApiArchiveSessionSchema>;

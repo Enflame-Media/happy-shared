@@ -17,7 +17,7 @@ export * from './misc';
 
 // Import for discriminated union
 import { ApiUpdateNewMessageSchema, ApiDeleteSessionSchema } from './message';
-import { ApiUpdateNewSessionSchema, ApiUpdateSessionStateSchema } from './session';
+import { ApiUpdateNewSessionSchema, ApiUpdateSessionStateSchema, ApiArchiveSessionSchema } from './session';
 import { ApiNewMachineSchema, ApiUpdateMachineStateSchema } from './machine';
 import { ApiNewArtifactSchema, ApiUpdateArtifactSchema, ApiDeleteArtifactSchema } from './artifact';
 import { ApiUpdateAccountSchema } from './account';
@@ -51,6 +51,7 @@ export const ApiUpdateSchema = z.discriminatedUnion('t', [
     ApiUpdateNewMessageSchema,
     ApiUpdateNewSessionSchema,
     ApiDeleteSessionSchema,
+    ApiArchiveSessionSchema,
     ApiUpdateSessionStateSchema,
     ApiUpdateAccountSchema,
     ApiUpdateMachineStateSchema,
