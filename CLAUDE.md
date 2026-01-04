@@ -29,6 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |---------|-----------|-------------|---------------|
 | **@happy/protocol** | [`packages/@happy/protocol/`](./packages/@happy/protocol/) | Shared Zod schemas for API types | [`packages/@happy/protocol/CLAUDE.md`](./packages/@happy/protocol/CLAUDE.md) |
 | **@happy/errors** | [`packages/@happy/errors/`](./packages/@happy/errors/) | Unified error handling (AppError) | [`packages/@happy/errors/CLAUDE.md`](./packages/@happy/errors/CLAUDE.md) |
+| **@happy/lint-rules** | [`packages/@happy/lint-rules/`](./packages/@happy/lint-rules/) | Custom oxlint/ESLint rules | [`packages/@happy/lint-rules/CLAUDE.md`](./packages/@happy/lint-rules/CLAUDE.md) |
 
 ### Additional Documentation
 
@@ -138,6 +139,25 @@ yarn workspace @happy/errors build
 yarn workspace @happy/errors typecheck
 ```
 
+### @happy/lint-rules
+
+> **Full documentation**: [`packages/@happy/lint-rules/CLAUDE.md`](./packages/@happy/lint-rules/CLAUDE.md)
+
+The `@happy/lint-rules` package provides custom linting rules for oxlint and ESLint:
+- **happy/github-casing**: Enforces "GitHub" casing in PascalCase identifiers (HAP-502)
+- **happy/protocol-helpers**: Enforces `@happy/protocol` ID accessor helper usage (HAP-658)
+
+**Usage with oxlint:**
+```json
+{
+    "jsPlugins": ["@happy/lint-rules"],
+    "rules": {
+        "happy/github-casing": "warn",
+        "happy/protocol-helpers": "warn"
+    }
+}
+```
+
 ### Consuming Shared Packages
 
 Projects consume packages via workspace linking:
@@ -146,6 +166,9 @@ Projects consume packages via workspace linking:
   "dependencies": {
     "@happy/protocol": "workspace:*",
     "@happy/errors": "workspace:*"
+  },
+  "devDependencies": {
+    "@happy/lint-rules": "workspace:*"
   }
 }
 ```
