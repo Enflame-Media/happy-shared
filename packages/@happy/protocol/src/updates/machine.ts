@@ -106,3 +106,39 @@ export const ApiUpdateMachineStateSchema = z.object({
 });
 
 export type ApiUpdateMachineState = z.infer<typeof ApiUpdateMachineStateSchema>;
+
+/**
+ * Delete machine update
+ *
+ * Sent when a machine is disconnected/unauthenticated from an account.
+ * The machine will need to re-authenticate via QR code to reconnect.
+ *
+ * @example
+ * ```typescript
+ * const deleteMachine = ApiDeleteMachineSchema.parse({
+ *     t: 'delete-machine',
+ *     machineId: 'machine_laptop1'
+ * });
+ * ```
+ */
+export const ApiDeleteMachineSchema = z.object({
+    t: z.literal('delete-machine'),
+    /**
+     * Machine ID being deleted/disconnected
+     *
+     * @remarks
+     * Field name: `machineId`
+     *
+     * All machine-related schemas consistently use `machineId` (HAP-655):
+     * - `new-machine`: uses `machineId`
+     * - `update-machine`: uses `machineId`
+     * - `delete-machine`: uses `machineId`
+     * - `machine-status`: uses `machineId`
+     * - `machine-activity`: uses `machineId`
+     *
+     * @see HAP-778 - Machine disconnect functionality
+     */
+    machineId: z.string().min(1).max(STRING_LIMITS.ID_MAX),
+});
+
+export type ApiDeleteMachine = z.infer<typeof ApiDeleteMachineSchema>;
