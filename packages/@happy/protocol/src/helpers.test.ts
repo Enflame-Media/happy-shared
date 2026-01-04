@@ -134,6 +134,14 @@ const machineStatusEphemeral: ApiEphemeralUpdate = {
     timestamp: Date.now(),
 };
 
+// HAP-780: Machine disconnected notification
+const machineDisconnectedEphemeral: ApiEphemeralUpdate = {
+    type: 'machine-disconnected',
+    machineId: 'machine-disconnected-id',
+    reason: 'disconnected_by_user',
+    timestamp: Date.now(),
+};
+
 // =============================================================================
 // Session ID Helpers Tests
 // =============================================================================
@@ -279,6 +287,10 @@ describe('Machine ID Helpers', () => {
             expect(hasMachineIdEphemeral(machineStatusEphemeral)).toBe(true);
         });
 
+        it('returns true for machine-disconnected', () => {
+            expect(hasMachineIdEphemeral(machineDisconnectedEphemeral)).toBe(true);
+        });
+
         it('returns false for activity', () => {
             expect(hasMachineIdEphemeral(activityEphemeral)).toBe(false);
         });
@@ -306,6 +318,10 @@ describe('Machine ID Helpers', () => {
         it('extracts machineId from machine-status', () => {
             expect(getMachineIdFromEphemeral(machineStatusEphemeral as MachineIdEphemeral)).toBe('machine-status-id');
         });
+
+        it('extracts machineId from machine-disconnected', () => {
+            expect(getMachineIdFromEphemeral(machineDisconnectedEphemeral as MachineIdEphemeral)).toBe('machine-disconnected-id');
+        });
     });
 
     describe('tryGetMachineId', () => {
@@ -325,6 +341,7 @@ describe('Machine ID Helpers', () => {
         it('returns machine id for machine ephemeral updates', () => {
             expect(tryGetMachineIdFromEphemeral(machineActivityEphemeral)).toBe('machine-activity-id');
             expect(tryGetMachineIdFromEphemeral(machineStatusEphemeral)).toBe('machine-status-id');
+            expect(tryGetMachineIdFromEphemeral(machineDisconnectedEphemeral)).toBe('machine-disconnected-id');
         });
 
         it('returns undefined for session ephemeral updates', () => {
