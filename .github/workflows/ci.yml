@@ -318,6 +318,88 @@ jobs:
         working-directory: happy-app
         run: yarn lint
 
+  lint-admin:
+    name: Lint - happy-admin
+    runs-on: ubuntu-latest
+    needs: build-protocol
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            .yarn/cache
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Download protocol dist
+        uses: actions/download-artifact@v6
+        with:
+          name: protocol-dist
+          path: packages/@happy/protocol/dist
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint happy-admin
+        working-directory: happy-admin
+        run: yarn lint
+
+  lint-admin-api:
+    name: Lint - happy-admin-api
+    runs-on: ubuntu-latest
+    needs: build-protocol
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            .yarn/cache
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Download protocol dist
+        uses: actions/download-artifact@v6
+        with:
+          name: protocol-dist
+          path: packages/@happy/protocol/dist
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint happy-admin-api
+        working-directory: happy-admin-api
+        run: yarn lint
+
   # ============================================
   # Tests - All Projects (parallel)
   # ============================================
@@ -587,7 +669,7 @@ jobs:
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
-    needs: [build-protocol, typecheck-cli, typecheck-workers, typecheck-app, lint-cli, lint-workers, lint-app, test-workers, build-workers, build-cli, openapi-server, schema-drift]
+    needs: [build-protocol, typecheck-cli, typecheck-workers, typecheck-app, lint-cli, lint-workers, lint-app, lint-admin, lint-admin-api, test-workers, build-workers, build-cli, openapi-server, schema-drift]
     if: always()
 
     steps:
@@ -600,6 +682,8 @@ jobs:
           CLI_LINT_RESULT: ${{ needs.lint-cli.result }}
           WORKERS_LINT_RESULT: ${{ needs.lint-workers.result }}
           APP_LINT_RESULT: ${{ needs.lint-app.result }}
+          ADMIN_LINT_RESULT: ${{ needs.lint-admin.result }}
+          ADMIN_API_LINT_RESULT: ${{ needs.lint-admin-api.result }}
           WORKERS_TEST_RESULT: ${{ needs.test-workers.result }}
           WORKERS_BUILD_RESULT: ${{ needs.build-workers.result }}
           CLI_BUILD_RESULT: ${{ needs.build-cli.result }}
@@ -627,6 +711,8 @@ jobs:
           echo "| Lint - happy-cli | $(get_status "$CLI_LINT_RESULT") |" >> $GITHUB_STEP_SUMMARY
           echo "| Lint - happy-server-workers | $(get_status "$WORKERS_LINT_RESULT") |" >> $GITHUB_STEP_SUMMARY
           echo "| Lint - happy-app | $(get_status "$APP_LINT_RESULT") |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint - happy-admin | $(get_status "$ADMIN_LINT_RESULT") |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint - happy-admin-api | $(get_status "$ADMIN_API_LINT_RESULT") |" >> $GITHUB_STEP_SUMMARY
           echo "| Test - happy-server-workers | $(get_status "$WORKERS_TEST_RESULT") |" >> $GITHUB_STEP_SUMMARY
           echo "| Build - happy-server-workers | $(get_status "$WORKERS_BUILD_RESULT") |" >> $GITHUB_STEP_SUMMARY
           echo "| Build - happy-cli | $(get_status "$CLI_BUILD_RESULT") |" >> $GITHUB_STEP_SUMMARY
@@ -642,6 +728,8 @@ jobs:
           CLI_LINT_RESULT: ${{ needs.lint-cli.result }}
           WORKERS_LINT_RESULT: ${{ needs.lint-workers.result }}
           APP_LINT_RESULT: ${{ needs.lint-app.result }}
+          ADMIN_LINT_RESULT: ${{ needs.lint-admin.result }}
+          ADMIN_API_LINT_RESULT: ${{ needs.lint-admin-api.result }}
           WORKERS_TEST_RESULT: ${{ needs.test-workers.result }}
           WORKERS_BUILD_RESULT: ${{ needs.build-workers.result }}
           CLI_BUILD_RESULT: ${{ needs.build-cli.result }}
@@ -655,6 +743,8 @@ jobs:
              [ "$CLI_LINT_RESULT" != "success" ] || \
              [ "$WORKERS_LINT_RESULT" != "success" ] || \
              [ "$APP_LINT_RESULT" != "success" ] || \
+             [ "$ADMIN_LINT_RESULT" != "success" ] || \
+             [ "$ADMIN_API_LINT_RESULT" != "success" ] || \
              [ "$WORKERS_TEST_RESULT" != "success" ] || \
              [ "$WORKERS_BUILD_RESULT" != "success" ] || \
              [ "$CLI_BUILD_RESULT" != "success" ] || \
