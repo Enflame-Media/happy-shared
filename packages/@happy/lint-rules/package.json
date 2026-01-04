@@ -1,0 +1,30 @@
+{
+    "name": "@happy/lint-rules",
+    "version": "0.0.1",
+    "description": "Custom oxlint/ESLint rules for the Happy monorepo",
+    "type": "module",
+    "main": "./src/index.js",
+    "exports": {
+        ".": "./src/index.js",
+        "./github-casing": "./src/rules/github-casing.js",
+        "./protocol-helpers": "./src/rules/protocol-helpers.js"
+    },
+    "files": [
+        "src"
+    ],
+    "keywords": [
+        "eslint",
+        "oxlint",
+        "linting",
+        "happy"
+    ],
+    "author": "Enflame Media",
+    "license": "UNLICENSED",
+    "private": true,
+    "devDependencies": {
+        "oxlint": "^1.36.0"
+    },
+    "peerDependencies": {
+        "oxlint": ">=1.36.0"
+    }
+}
