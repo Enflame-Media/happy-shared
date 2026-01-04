@@ -3,10 +3,14 @@
 # Each project (happy-app, happy-cli, etc.) has its own git repo.
 
 # Project directories (have their own git repos)
+/happy-admin/
+/happy-admin-api/
 /happy-app/
 /happy-cli/
+/happy-macos/
 /happy-server/
 /happy-server-workers/
+/happy-vue/
 
 # Dependencies (yarn workspaces hoisted dependencies)
 node_modules/
