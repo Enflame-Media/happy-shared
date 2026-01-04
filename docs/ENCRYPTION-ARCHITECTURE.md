@@ -17,16 +17,18 @@ Happy uses a **zero-knowledge architecture** where the server cannot decrypt use
 │  │             │  Enc    │                  │  Enc    │             │       │
 │  └──────┬──────┘         └────────┬─────────┘         └──────┬──────┘       │
 │         │                         │                          │               │
-│         ▼                         ▼                          ▼               │
-│  ┌─────────────┐         ┌──────────────────┐         ┌─────────────┐       │
-│  │ AES-256-GCM │         │ TweetNaCl        │         │ AES-256-GCM │       │
-│  │ + Key Ver.  │         │ secretbox        │         │ + SecretBox │       │
-│  │ + Legacy    │         │ (server secrets) │         │ (legacy)    │       │
-│  └─────────────┘         └──────────────────┘         └─────────────┘       │
+│         │          ┌──────────────┼──────────────┐          │               │
+│         │          │              │              │          │               │
+│         ▼          ▼              ▼              ▼          ▼               │
+│  ┌─────────────┐ ┌─────────────┐ ┌──────────────┐ ┌─────────────┐          │
+│  │ AES-256-GCM │ │ happy-macos │ │ TweetNaCl    │ │ AES-256-GCM │          │
+│  │ + Key Ver.  │ │ (CryptoKit) │ │ secretbox    │ │ + SecretBox │          │
+│  │ + Legacy    │ │ AES-256-GCM │ │ (svr secrets)│ │ (legacy)    │          │
+│  └─────────────┘ └─────────────┘ └──────────────┘ └─────────────┘          │
 │                                                                              │
 │  ═══════════════════════════════════════════════════════════════════════    │
 │   Layer 1: TLS 1.3 Transport (all connections)                               │
-│   Layer 2: End-to-End Encryption (user data - CLI/App only)                  │
+│   Layer 2: End-to-End Encryption (user data - CLI/App/macOS clients)         │
 │   Layer 3: Server-Side Encryption (server-managed secrets only)              │
 │  ═══════════════════════════════════════════════════════════════════════    │
 │                                                                              │
@@ -101,6 +103,31 @@ encryptLegacy(data, secret)  // XSalsa20-Poly1305
 ```
 [version:1][keyVersion:2][nonce:12][ciphertext:N][authTag:16]
 ```
+
+### macOS (`happy-macos/Happy/Services/EncryptionService.swift`)
+
+The macOS app uses **AES-256-GCM** via CryptoKit, matching the primary E2E format.
+
+```swift
+// Encrypt using AES-256-GCM
+let encrypted = try EncryptionService.encrypt(data, with: symmetricKey)
+
+// Decrypt using AES-256-GCM
+let decrypted = try EncryptionService.decrypt(encrypted, with: symmetricKey)
+```
+
+**Features**:
+- **AES-256-GCM**: Native CryptoKit implementation with hardware acceleration
+- **Hybrid Nonce**: 4 random bytes + 8-byte counter prevents nonce reuse
+- **Version Detection**: Supports both v0 (0x00) and v1 (0x01) bundle formats
+- **Key Derivation**: X25519 ECDH with HKDF using same parameters as CLI/App
+
+**Bundle Format**:
+```
+[version:1][nonce:12][ciphertext:N][authTag:16]
+```
+
+**Note**: The macOS app does NOT support the legacy secretbox format (XSalsa20-Poly1305) as it only needs to interoperate with modern encrypted data created by happy-cli and happy-app.
 
 ### App (`happy-app/sources/sync/encryption/`)
 
