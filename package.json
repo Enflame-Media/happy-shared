@@ -19,7 +19,8 @@
     "typecheck:errors": "yarn workspace @happy/errors typecheck",
     "typecheck:protocol": "yarn workspace @happy/protocol typecheck",
     "schema:extract": "yarn workspace @happy/protocol schema:extract",
-    "schema:compare": "tsx scripts/compare-schemas.ts"
+    "schema:compare": "tsx scripts/compare-schemas.ts",
+    "ncu:all": "find . -name package.json -not -path '*/node_modules/*' -execdir ncu -u \\;"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -30,6 +31,7 @@
     "@react-navigation/elements": "2.9.3",
     "@react-navigation/native-stack": "7.9.0",
     "@react-navigation/bottom-tabs": "7.8.12",
-    "@react-navigation/routers": "7.5.3"
+    "@react-navigation/routers": "7.5.3",
+    "miniflare/zod": "3.22.3"
   }
 }

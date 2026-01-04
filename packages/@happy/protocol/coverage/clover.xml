@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1767050362986" clover="3.2.0">
+  <project timestamp="1767050362987" name="All files">
+    <metrics statements="67" coveredstatements="58" conditionals="11" coveredconditionals="10" methods="15" coveredmethods="12" elements="93" coveredelements="80" complexity="0" loc="67" ncloc="67" packages="3" files="15" classes="15"/>
+    <package name="src">
+      <metrics statements="45" coveredstatements="38" conditionals="11" coveredconditionals="10" methods="13" coveredmethods="12"/>
+      <file name="common.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/common.ts">
+        <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="44" count="2" type="stmt"/>
+        <line num="73" count="2" type="stmt"/>
+        <line num="92" count="2" type="stmt"/>
+        <line num="118" count="2" type="stmt"/>
+        <line num="148" count="2" type="stmt"/>
+        <line num="168" count="2" type="stmt"/>
+        <line num="187" count="2" type="stmt"/>
+        <line num="212" count="2" type="stmt"/>
+      </file>
+      <file name="constraints.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/constraints.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="143" count="2" type="stmt"/>
+        <line num="166" count="2" type="stmt"/>
+      </file>
+      <file name="helpers.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/helpers.ts">
+        <metrics statements="23" coveredstatements="21" conditionals="11" coveredconditionals="10" methods="12" coveredmethods="12"/>
+        <line num="84" count="26" type="stmt"/>
+        <line num="102" count="9" type="stmt"/>
+        <line num="124" count="18" type="stmt"/>
+        <line num="146" count="5" type="stmt"/>
+        <line num="169" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="170" count="6" type="stmt"/>
+        <line num="172" count="5" type="stmt"/>
+        <line num="193" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="194" count="2" type="stmt"/>
+        <line num="196" count="2" type="stmt"/>
+        <line num="236" count="12" type="stmt"/>
+        <line num="254" count="9" type="stmt"/>
+        <line num="275" count="7" type="cond" truecount="2" falsecount="1"/>
+        <line num="278" count="7" type="stmt"/>
+        <line num="280" count="0" type="stmt"/>
+        <line num="281" count="0" type="stmt"/>
+        <line num="305" count="5" type="stmt"/>
+        <line num="326" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="327" count="2" type="stmt"/>
+        <line num="329" count="3" type="stmt"/>
+        <line num="350" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="351" count="2" type="stmt"/>
+        <line num="353" count="2" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/index.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="mcp.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/mcp.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+      </file>
+      <file name="payloads.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/payloads.ts">
+        <metrics statements="8" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.ephemeral">
+      <metrics statements="7" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <file name="events.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/ephemeral/events.ts">
+        <metrics statements="7" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="50" count="1" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="114" count="1" type="stmt"/>
+        <line num="142" count="1" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/ephemeral/index.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+    <package name="src.updates">
+      <metrics statements="15" coveredstatements="15" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="account.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/account.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="33" count="1" type="stmt"/>
+      </file>
+      <file name="artifact.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/artifact.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+        <line num="85" count="1" type="stmt"/>
+      </file>
+      <file name="index.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/index.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="49" count="1" type="stmt"/>
+      </file>
+      <file name="machine.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/machine.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="81" count="1" type="stmt"/>
+      </file>
+      <file name="message.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/message.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="58" count="2" type="stmt"/>
+        <line num="91" count="2" type="stmt"/>
+      </file>
+      <file name="misc.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/misc.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="61" count="1" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+      </file>
+      <file name="session.ts" path="/volume1/Projects/happy/packages/@happy/protocol/src/updates/session.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="37" count="2" type="stmt"/>
+        <line num="82" count="2" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

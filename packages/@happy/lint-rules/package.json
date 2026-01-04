@@ -26,10 +26,10 @@
     "license": "UNLICENSED",
     "private": true,
     "devDependencies": {
-        "@typescript-eslint/parser": "^8.32.1",
-        "eslint": "^9.28.0",
+        "@typescript-eslint/parser": "^8.51.0",
+        "eslint": "^9.39.2",
         "oxlint": "^1.36.0",
-        "vitest": "^3.2.4"
+        "vitest": "^4.0.16"
     },
     "peerDependencies": {
         "oxlint": ">=1.36.0"

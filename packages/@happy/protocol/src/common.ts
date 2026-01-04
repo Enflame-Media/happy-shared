@@ -53,6 +53,35 @@ export const GitHubProfileSchema = z.object({
 export type GitHubProfile = z.infer<typeof GitHubProfileSchema>;
 
 /**
+ * Build an OpenAPI-ready `GitHubProfile` schema using a Zod instance from
+ * `@hono/zod-openapi`. This avoids adding a hard runtime dependency on
+ * `@hono/zod-openapi` to the canonical package while still providing a
+ * single source of truth for schema constraints.
+ *
+ * Example:
+ *   import { z } from '@hono/zod-openapi';
+ *   import { makeOpenApiGitHubProfileSchema } from '@happy/protocol';
+ *   const openApiSchema = makeOpenApiGitHubProfileSchema(z);
+ */
+// We intentionally accept `any` for the Zod instance to avoid type
+// incompatibilities that can occur when different workspace packages have
+// separate Zod instances installed. The function is still fully typed at
+// runtime and will behave correctly when passed a `z` from
+// `@hono/zod-openapi` or plain `zod` that exposes `.openapi()`.
+export function makeOpenApiGitHubProfileSchema(zOpenApi: any) {
+    return zOpenApi
+        .object({
+            id: zOpenApi.number().openapi({ description: 'GitHub numeric id', example: 12345678 }),
+            login: zOpenApi.string().min(1).max(STRING_LIMITS.USERNAME_MAX).openapi({ description: 'GitHub login', example: 'octocat' }),
+            name: zOpenApi.string().max(STRING_LIMITS.NAME_MAX).nullable().optional().openapi({ description: 'Display name', example: 'The Octocat' }),
+            avatar_url: zOpenApi.string().max(STRING_LIMITS.URL_MAX).optional().openapi({ description: 'Avatar URL' }),
+            email: zOpenApi.string().max(STRING_LIMITS.NAME_MAX).nullable().optional().openapi({ description: 'Email address' }),
+            bio: zOpenApi.string().max(STRING_LIMITS.BIO_MAX).nullable().optional().openapi({ description: 'Bio' }),
+        })
+        .strip()
+        .openapi('GitHubProfile');
+}
+/**
  * Image reference for avatars and other media
  *
  * Note: width, height, and thumbhash are optional because:
@@ -123,6 +152,8 @@ export const UserProfileSchema = z.object({
     username: z.string().min(1).max(STRING_LIMITS.USERNAME_MAX),
     bio: z.string().max(STRING_LIMITS.BIO_MAX).nullable(),
     status: RelationshipStatusSchema,
+    /** ISO 8601 date when the friendship was accepted (only present for friends) */
+    friendshipDate: z.string().nullable().optional(),
 });
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
