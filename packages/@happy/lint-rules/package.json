@@ -12,6 +12,10 @@
     "files": [
         "src"
     ],
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
     "keywords": [
         "eslint",
         "oxlint",
@@ -22,7 +26,10 @@
     "license": "UNLICENSED",
     "private": true,
     "devDependencies": {
-        "oxlint": "^1.36.0"
+        "@typescript-eslint/parser": "^8.32.1",
+        "eslint": "^9.28.0",
+        "oxlint": "^1.36.0",
+        "vitest": "^3.2.4"
     },
     "peerDependencies": {
         "oxlint": ">=1.36.0"

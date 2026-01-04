@@ -107,12 +107,15 @@ export default [
 ```
 packages/@happy/lint-rules/
 ├── src/
-│   ├── index.js           # Plugin entry point
+│   ├── index.js                   # Plugin entry point
 │   └── rules/
-│       ├── github-casing.js    # GitHub casing rule
-│       └── protocol-helpers.js # Protocol helper rule
+│       ├── github-casing.js       # GitHub casing rule
+│       ├── github-casing.test.js  # Tests for github-casing rule
+│       ├── protocol-helpers.js    # Protocol helper rule
+│       └── protocol-helpers.test.js # Tests for protocol-helpers rule
+├── vitest.config.js               # Vitest configuration
 ├── package.json
-└── CLAUDE.md              # This file
+└── CLAUDE.md                      # This file
 ```
 
 ### Adding New Rules
@@ -141,13 +144,32 @@ packages/@happy/lint-rules/
 
 ### Testing
 
-Rules are tested by:
-1. Running oxlint/ESLint on the codebase with the rules enabled
-2. Verifying expected warnings/errors are reported
+Rules are tested using Vitest with ESLint's `RuleTester`:
+
+```bash
+# Run tests
+yarn workspace @happy/lint-rules test
+
+# Run tests in watch mode
+yarn workspace @happy/lint-rules test:watch
+```
+
+Each rule has a corresponding `.test.js` file that tests:
+- Valid code patterns (should not trigger warnings)
+- Invalid code patterns (should trigger warnings with correct message IDs)
+- Auto-fix behavior (for fixable rules like `github-casing`)
+- Edge cases (test file exclusions, various access patterns)
+
+**Test counts:**
+- `github-casing`: 21 tests (14 valid + 7 invalid patterns)
+- `protocol-helpers`: 27 tests (14 valid + 13 invalid patterns)
+
+**See:** HAP-763 for test implementation
 
 ## Related Issues
 
 - HAP-758: Adopt oxlint type-aware linting and JS plugins
+- HAP-763: Add unit tests for @happy/lint-rules oxlint plugin
 - HAP-502: ESLint naming convention rule for GitHub casing
 - HAP-658: ESLint rule to enforce @happy/protocol ID accessor helper usage
 - HAP-653: Protocol ID accessor helper design
