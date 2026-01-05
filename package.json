@@ -6,7 +6,6 @@
   "workspaces": [
     "packages/@happy/*",
     "happy-cli",
-    "happy-server",
     "happy-server-workers",
     "happy-app",
     "happy-admin",
